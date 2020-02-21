@@ -205,7 +205,7 @@ def get_or_create_snailtrack(instance, deleted=False, do_create_action=True):
                 create_action(instance=instance, snailtrack=snailtrack,
                               deleted=deleted)
             return snailtrack, created
-    except SnailtrackerMutexLockedError, e:
+    except SnailtrackerMutexLockedError as e:
         logger.debug('Attempting to access locked record. Message: {0} Trying again...'.format(e))
         time.sleep(.250)
         return get_or_create_snailtrack(instance=instance, deleted=deleted,
@@ -250,7 +250,7 @@ def snailtracker_post_init_hook(sender, instance, **kwargs):
         if not instance.id:
             instance.snailtracker_new = True
         instance.post_init_snapshot = make_model_snapshot(instance)
-    except Exception, e:
+    except Exception as e:
         try:
             import traceback
 #:TODO: this...
@@ -281,7 +281,7 @@ def snailtracker_post_save_hook(sender, instance, **kwargs):
         else:
             get_or_create_snailtrack(instance)
         instance.snailtracker_new = False
-    except Exception, e:
+    except Exception as e:
         try:
             import traceback
 #:TODO: this...
@@ -306,7 +306,7 @@ def snailtracker_post_delete_hook(sender, instance, **kwargs):
             offload_wrapper.delay(instance, deleted=True)
         else:
             get_or_create_snailtrack(instance, deleted=True)
-    except Exception, e:
+    except Exception as e:
         try:
             import traceback
             send_mail(
